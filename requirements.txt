@@ -1,4 +1,8 @@
 babel
 python-dateutil==2.6.0
+psycopg2
+flask
+flask-migrate
 flask-moment
 flask-wtf
+flask-sqlalchemy
