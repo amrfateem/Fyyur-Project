@@ -18,6 +18,7 @@ from forms import *
 import sys
 from sqlalchemy import func
 from flask_migrate import Migrate
+from models import *
 
 
 #----------------------------------------------------------------------------#
@@ -35,54 +36,8 @@ migrate = Migrate(app, db)
 # Models.
 #----------------------------------------------------------------------------#
 
-# wanted to put them in a standalone file but didn't seem to work
-# The line for table name wasn't needed here so i removed it
-# Don't see any missing columns so i didn't add any
-# Migrated the databases with flask migrate works well in env
+#With imports
 
-
-class Venue(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    genres = db.Column(db.ARRAY(db.String()))
-    address = db.Column(db.String(120))
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    shows = db.relationship('Show', backref="venue", lazy=True)
-
-    def __repr__(self):
-        return '<Venue {}>'.format(self.name)
-
-
-class Artist(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    genres = db.Column(db.ARRAY(db.String))
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    website = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    shows = db.relationship('Show', backref="artist", lazy=True)
-
-    def __repr__(self):
-        return '<Artist {}>'.format(self.name)
-
-
-class Show(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey(
-        'artist.id'), nullable=False)
-    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), nullable=False)
-    start_time = db.Column(db.DateTime, nullable=False)
-
-    def __repr__(self):
-        return '<Show {}{}>'.format(self.artist_id, self.venue_id)
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -145,7 +100,7 @@ def venues():
 def search_venues():
     search_term = request.form.get('search_term', '')
     search_result = db.session.query(Venue).filter(
-        Venue.name.term(f'%{search_term}%')).all()
+        Venue.name.ilike(f'%{search_term}%')).all()
     data = []
 
     for result in search_result:
@@ -288,7 +243,7 @@ def artists():
 def search_artists():
     search_term = request.form.get('search_term', '')
     search_result = db.session.query(Artist).filter(
-        Artist.name.term(f'%{search_term}%')).all()
+        Artist.name.ilike(f'%{search_term}%')).all()
     data = []
 
     for result in search_result:
